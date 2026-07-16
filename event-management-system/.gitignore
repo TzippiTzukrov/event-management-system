@@ -1,0 +1,27 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# dotnet
+*.dll
+*.exe
+*.pdb
+
+# קובץ ההוראות
+*.docx
+
+# Secrets
+GatherUp.API/appsettings.json
+
+# Data files
+GatherUp.Infrastructure/Data/events.xml
+
+# Node
+node_modules/
+dist/
+.vite/
