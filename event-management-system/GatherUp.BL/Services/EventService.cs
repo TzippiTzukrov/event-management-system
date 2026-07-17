@@ -25,15 +25,28 @@ public class EventService(IRepository<GatherEvent> eventRepo, IEventNotifier not
         return gatherEvent;
     }
 
-    public GatherEvent Update(GatherEvent gatherEvent)
+    public GatherEvent UpdateDetails(Guid id, UpdateEventDto dto)
     {
-        if (string.IsNullOrWhiteSpace(gatherEvent.Title))
+        var ev = eventRepo.GetById(id)
+            ?? throw new NotFoundException($"אירוע {id} לא נמצא.");
+
+        if (string.IsNullOrWhiteSpace(dto.Title))
             throw new ValidationException("כותרת האירוע היא שדה חובה.");
 
-        eventRepo.Update(gatherEvent);
+        ev.Title                  = dto.Title;
+        ev.EventDate              = dto.EventDate;
+        ev.Location               = dto.Location;
+        ev.PricePerParticipant    = dto.PricePerParticipant;
+        ev.CustomMessage          = dto.CustomMessage;
+        ev.PaymentMethod          = dto.PaymentMethod;
+        ev.BankDetails            = dto.BankDetails;
+        ev.CashContactName        = dto.CashContactName;
+        ev.InvitationScheduledAt  = dto.InvitationScheduledAt;
+        ev.InvitationContent      = dto.InvitationContent ?? ev.InvitationContent;
 
-        notifier.RaiseEventUpdated(new EventUpdatedEventArgs(gatherEvent.Id, gatherEvent.Title));
-        return gatherEvent;
+        eventRepo.Update(ev);
+        notifier.RaiseEventUpdated(new EventUpdatedEventArgs(ev.Id, ev.Title));
+        return ev;
     }
 
     public void Delete(Guid id) => eventRepo.Delete(id);

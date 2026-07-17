@@ -40,13 +40,13 @@ public class EventsController(
 
     [Authorize(Roles = "Admin,Manager")]
     [HttpPut("{id:guid}")]
-    public IActionResult Update(Guid id, GatherEvent gatherEvent)
+    public IActionResult Update(Guid id, UpdateEventDto dto)
     {
-        if (id != gatherEvent.Id)
+        if (id != dto.Id)
             throw new ValidationException("מזהה האירוע אינו תואם.");
         if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), id))
             return Forbid();
-        return Ok(eventService.Update(gatherEvent));
+        return Ok(eventService.UpdateDetails(id, dto));
     }
 
     [Authorize(Roles = "Admin")]
@@ -64,34 +64,6 @@ public class EventsController(
         if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), id))
             return Forbid();
         eventService.UpdateStatus(id, newStatus);
-        return NoContent();
-    }
-
-    [Authorize(Roles = "Admin,Manager")]
-    [HttpPut("{id:guid}/host")]
-    public IActionResult SetHost(Guid id, EventHost host)
-    {
-        if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), id))
-            return Forbid();
-        return Ok(eventService.SetHost(id, host));
-    }
-
-    [Authorize(Roles = "Admin,Manager")]
-    [HttpPost("{id:guid}/managers")]
-    public IActionResult AddManager(Guid id, EventManager manager)
-    {
-        if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), id))
-            return Forbid();
-        return Ok(eventService.AddManager(id, manager));
-    }
-
-    [Authorize(Roles = "Admin,Manager")]
-    [HttpDelete("{id:guid}/managers/{managerId:guid}")]
-    public IActionResult RemoveManager(Guid id, Guid managerId)
-    {
-        if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), id))
-            return Forbid();
-        eventService.RemoveManager(id, managerId);
         return NoContent();
     }
 

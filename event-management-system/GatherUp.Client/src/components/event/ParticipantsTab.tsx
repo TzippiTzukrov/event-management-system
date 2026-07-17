@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { eventsApi } from '../../api/events'
 import { usersApi } from '../../api/users'
 import type { GatherEvent, Participant } from '../../types'
-import { NotificationPreference } from '../../types'
+import { NotificationPreference, UserRole } from '../../types'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
@@ -47,10 +47,16 @@ export function ParticipantsTab({ event, onReload }: Props) {
       let temporaryPassword: string | null = null
       let alreadyHadAccount = false
       try {
-        const res = await usersApi.create({ username: form.email, role: 'User', email: form.email })
+        const res = await usersApi.create({ username: form.email, role: UserRole.Participant, email: form.email })
         temporaryPassword = res.temporaryPassword
-      } catch {
-        alreadyHadAccount = true
+      } catch (err) {
+        // 409 = username already exists; any other error is unexpected
+        const status = (err as { status?: number })?.status
+        if (status === 409 || status === 400) {
+          alreadyHadAccount = true
+        } else {
+          throw err
+        }
       }
 
       setShowAdd(false)

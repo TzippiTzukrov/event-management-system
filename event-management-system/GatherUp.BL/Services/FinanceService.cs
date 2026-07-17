@@ -1,3 +1,4 @@
+using GatherUp.Infrastructure.Repositories;
 using GatherUp.Core.Enums;
 using GatherUp.Core.Events;
 using GatherUp.Core.Exceptions;
@@ -6,7 +7,7 @@ using GatherUp.Core.Models;
 
 namespace GatherUp.BL.Services;
 
-public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier notifier)
+public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier notifier, ReceiptXmlRepository receiptRepo)
 {
     public void MarkPayment(Guid eventId, Guid participantId, decimal amount, PaymentMethod method)
     {
@@ -23,8 +24,8 @@ public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier n
             throw new BusinessRuleException(
                 $"אמצעי התשלום '{method}' אינו תואם את שיטת התשלום שנקבעה לאירוע '{ev.PaymentMethod}'.");
 
-        participant.HasPaid    = true;
-        participant.AmountPaid = amount;
+        participant.HasPaid     = true;
+        participant.AmountPaid += amount;
         eventRepo.Update(ev);
 
         notifier.RaisePayment(new PaymentEventArgs(eventId, participantId, participant.Name, amount));
@@ -51,11 +52,10 @@ public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier n
         var ev = eventRepo.GetById(eventId)
             ?? throw new NotFoundException($"אירוע {eventId} לא נמצא.");
 
-        var vendor = ev.Vendors.FirstOrDefault(v => v.Id == vendorId)
-            ?? throw new NotFoundException($"ספק {vendorId} לא נמצא.");
+        if (!ev.Vendors.Any(v => v.Id == vendorId))
+            throw new NotFoundException($"ספק {vendorId} לא נמצא.");
 
-        vendor.Receipts.Add(receipt);
-        eventRepo.Update(ev);
+        receiptRepo.Add(receipt);
     }
 
     public IEnumerable<VendorAllocation> GetVendors(Guid eventId)
@@ -78,17 +78,13 @@ public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier n
     }
 
     /// <summary>
-    /// חישוב תקציב דינמי בשרשור LINQ — סך גבייה פחות חובות לספקים.
+    /// חישוב תקציב — סך גבייה (כל מי ששילם) פחות חובות לספקים.
     /// </summary>
     public decimal GetBudget(Guid eventId)
     {
         var ev = eventRepo.GetById(eventId)
             ?? throw new NotFoundException($"אירוע {eventId} לא נמצא.");
-
-        return ev.Participants
-                   .Where(p => p.IsAttending == true && p.HasPaid)
-                   .Sum(p => p.AmountPaid)
-               - ev.Vendors.Sum(v => v.AmountOwed);
+        return ev.Budget;
     }
 
     /// <summary>

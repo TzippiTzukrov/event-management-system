@@ -29,13 +29,13 @@ public class PollsController(
     }
 
     /// <summary>
-    /// הצבעה — רק משתתף של האירוע.
+    /// הצבעה — רק משתתף של האירוע, ורק בשמו של עצמו.
     /// </summary>
     [Authorize(Roles = "Participant")]
     [HttpPost("{pollId:guid}/questions/{questionId:guid}/vote")]
     public IActionResult Vote(Guid eventId, Guid pollId, Guid questionId, [FromBody] VoteRequest request)
     {
-        if (!authorizationService.IsParticipantOfEvent(CurrentUserId(), eventId, CurrentUsername()))
+        if (!pollService.IsParticipantOwner(eventId, request.ParticipantId, CurrentUserId(), CurrentUsername()))
             return Forbid();
         pollService.Vote(eventId, pollId, questionId, request.ParticipantId, request.Answer);
         return NoContent();

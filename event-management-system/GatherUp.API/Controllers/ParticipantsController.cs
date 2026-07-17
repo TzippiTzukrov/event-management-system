@@ -42,7 +42,7 @@ public class ParticipantsController(
     [HttpPatch("{participantId:guid}/rsvp")]
     public IActionResult UpdateRsvp(Guid eventId, Guid participantId, [FromBody] bool isAttending)
     {
-        if (!authorizationService.IsParticipantOfEvent(CurrentUserId(), eventId, CurrentUsername()))
+        if (!participantService.IsOwner(eventId, participantId, CurrentUserId(), CurrentUsername()))
             return Forbid();
         participantService.UpdateRsvp(eventId, participantId, isAttending);
         return NoContent();

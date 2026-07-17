@@ -65,7 +65,7 @@ public class GatherEvent : IIdentifiable
 
     [XmlIgnore]
     public decimal TotalCollected => Participants
-        .Where(p => p.HasPaid)
+        .Where(p => p.IsAttending == true && p.HasPaid)
         .Sum(p => p.AmountPaid);
 
     [XmlIgnore]

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="GatherUp.API/GatherUp.API.csproj" />
+  <Project Path="GatherUp.BL/GatherUp.BL.csproj" />
+  <Project Path="GatherUp.Core/GatherUp.Core.csproj" />
+  <Project Path="GatherUp.Infrastructure/GatherUp.Infrastructure.csproj" />
+  <Project Path="GatherUp.Tests/GatherUp.Tests.csproj" />
+</Solution>

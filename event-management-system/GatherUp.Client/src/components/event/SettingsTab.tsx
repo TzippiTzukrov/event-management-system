@@ -44,10 +44,16 @@ export function SettingsTab({ event, onReload }: Props) {
     setEditLoading(true)
     try {
       await eventsApi.update(event.id, {
-        ...event,
-        ...form,
-        pricePerParticipant: form.pricePerParticipant ? Number(form.pricePerParticipant) : undefined,
+        id: event.id,
+        title: form.title,
         eventDate: form.eventDate || undefined,
+        location: form.location || undefined,
+        pricePerParticipant: form.pricePerParticipant ? Number(form.pricePerParticipant) : undefined,
+        customMessage: form.customMessage || undefined,
+        paymentMethod: form.paymentMethod,
+        bankDetails: form.bankDetails || undefined,
+        cashContactName: form.cashContactName || undefined,
+        invitationContent: form.invitationContent,
       })
       setSuccess('השינויים נשמרו בהצלחה')
       onReload()

@@ -15,7 +15,7 @@ interface AuthContextValue extends AuthState {
   isAuthenticated: boolean
   isAdmin: boolean
   isManager: boolean
-  isHost: boolean
+  isHost: boolean // role מתוכנן — אין כרגע [Authorize(Roles="Host")] בשום endpoint
   isParticipant: boolean
   canManage: boolean // Admin או Manager
 }

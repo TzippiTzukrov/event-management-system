@@ -6,8 +6,11 @@ using GatherUp.Infrastructure.Repositories;
 
 namespace GatherUp.BL.Services;
 
-public class PollService(IRepository<GatherEvent> eventRepo, VotesXmlRepository votesRepo, IEventNotifier notifier)
+public class PollService(IRepository<GatherEvent> eventRepo, VotesXmlRepository votesRepo, IEventNotifier notifier, ParticipantService participantService)
 {
+    public bool IsParticipantOwner(Guid eventId, Guid participantId, Guid callerId, string? callerUsername)
+        => participantService.IsOwner(eventId, participantId, callerId, callerUsername);
+
     public Poll AddPoll(Guid eventId, Poll poll)
     {
         var ev = eventRepo.GetById(eventId)
@@ -63,7 +66,7 @@ public class PollService(IRepository<GatherEvent> eventRepo, VotesXmlRepository 
     }
 
     /// <summary>
-    /// תוצאות הצבעה באחוזים — LINQ בלבד.
+    /// ספירת קולות לכל תשובה — LINQ בלבד.
     /// </summary>
     public Dictionary<string, int> GetResults(Guid eventId, Guid pollId, Guid questionId)
     {

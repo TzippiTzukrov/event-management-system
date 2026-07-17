@@ -59,15 +59,28 @@ builder.Services.AddSingleton<IUserRepository>(
     _ => new UserRepository(Path.Combine(dataPath, "users.xml")));
 builder.Services.AddSingleton(
     _ => new VotesXmlRepository(Path.Combine(dataPath, "votes.xml")));
+builder.Services.AddSingleton(
+    _ => new ReceiptXmlRepository(
+        Path.Combine(dataPath, "receipts.xml"),
+        Path.Combine(dataPath, "Receipts")));
 
 // --- Infrastructure ---
 var emailConfig = builder.Configuration.GetSection("Email");
-builder.Services.AddSingleton<IEmailService>(_ => new EmailService(
-    emailConfig["From"]!,
-    emailConfig["Password"]!,
-    emailConfig["Host"]!,
-    int.Parse(emailConfig["Port"]!)
-));
+var emailFrom     = emailConfig["From"];
+var emailPassword = emailConfig["Password"];
+var emailHost     = emailConfig["Host"];
+var emailPortStr  = emailConfig["Port"];
+
+if (string.IsNullOrWhiteSpace(emailFrom) || string.IsNullOrWhiteSpace(emailPassword) ||
+    string.IsNullOrWhiteSpace(emailHost) || !int.TryParse(emailPortStr, out var emailPort))
+{
+    Console.WriteLine("[WARNING] Email configuration is missing or incomplete. Email sending will be disabled.");
+    builder.Services.AddSingleton<IEmailService>(_ => new GatherUp.Infrastructure.Email.NoOpEmailService());
+}
+else
+{
+    builder.Services.AddSingleton<IEmailService>(_ => new EmailService(emailFrom, emailPassword, emailHost, emailPort));
+}
 
 // --- Services ---
 builder.Services.AddSingleton<IEventNotifier, EventNotifier>();
