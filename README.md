@@ -1,36 +1,36 @@
 # GatherUp — Event Management System
 
-מערכת לניהול אירועים מלאה עם ממשק משתמש, API, ניהול משתתפים, סקרים ופיננסים.
+A full-featured event management system with a user interface, API, participant management, polls, and financials.
 
 ---
 
-## צילומי מסך
+## Screenshots
 
-### התחברות
+### Login
 ![Login](event-management-system/screenshots/login.png)
 
-### לוח בקרה — מנהל אירועים
+### Manager Dashboard
 ![Manager Dashboard](event-management-system/screenshots/events_manager_dashboard.png)
 
-### לוח בקרה — משתמש
+### User Dashboard
 ![User Dashboard](event-management-system/screenshots/user_dashboard.png)
 
-### סקרים — מנהל
+### Polls — Manager View
 ![Polls](event-management-system/screenshots/polls_manager_dashboard.png)
 
-### פיננסים — מנהל
+### Finance — Manager View
 ![Finance](event-management-system/screenshots/manager%20finance.png)
 
 ---
 
-## טכנולוגיות
+## Tech Stack
 
 **Backend**
 - .NET 8 — Web API
 - JWT Authentication
-- XML-based persistence (ללא מסד נתונים)
-- BCrypt לגיבוב סיסמאות
-- SMTP לשליחת מיילים
+- XML-based persistence (no database)
+- BCrypt for password hashing
+- SMTP for email sending
 
 **Frontend**
 - React 19 + TypeScript
@@ -39,29 +39,29 @@
 
 ---
 
-## מבנה הפרויקט
+## Project Structure
 
 ```
 event-management-system/
-├── GatherUp.API/          # שכבת Web API — Controllers, Middleware
-├── GatherUp.BL/           # שכבת לוגיקה עסקית — Services
-├── GatherUp.Core/         # מודלים, Interfaces, Enums, Exceptions
+├── GatherUp.API/            # Web API layer — Controllers, Middleware
+├── GatherUp.BL/             # Business logic layer — Services
+├── GatherUp.Core/           # Models, Interfaces, Enums, Exceptions
 ├── GatherUp.Infrastructure/ # Repositories, XML, Email
-├── GatherUp.Client/       # React Frontend
-└── GatherUp.Tests/        # בדיקות
+├── GatherUp.Client/         # React Frontend
+└── GatherUp.Tests/          # Tests
 ```
 
 ---
 
-## הרצה מקומית
+## Running Locally
 
-### דרישות מוקדמות
+### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 18+](https://nodejs.org/)
 
-### 1. הגדרת appsettings
+### 1. Configure appsettings
 
-בתיקיית `GatherUp.API`, צור קובץ `appsettings.json` על בסיס `appsettings.Example.json`:
+In the `GatherUp.API` folder, create an `appsettings.json` based on `appsettings.Example.json`:
 
 ```json
 {
@@ -77,19 +77,19 @@ event-management-system/
 }
 ```
 
-> אם לא מוגדר Email — המערכת תעבוד ללא שליחת מיילים.
+> If Email is not configured — the system will run without sending emails.
 
-### 2. הפעלת השרת
+### 2. Start the server
 
 ```bash
 cd event-management-system/GatherUp.API
 dotnet run
 ```
 
-השרת יעלה על: `http://localhost:5000`  
-Swagger UI זמין על: `http://localhost:5000/swagger`
+Server runs at: `http://localhost:5000`  
+Swagger UI available at: `http://localhost:5000/swagger`
 
-### 3. הפעלת הלקוח
+### 3. Start the client
 
 ```bash
 cd event-management-system/GatherUp.Client
@@ -97,24 +97,24 @@ npm install
 npm run dev
 ```
 
-הלקוח יעלה על: `http://localhost:5173`
+Client runs at: `http://localhost:5173`
 
 ---
 
-## משתמשים ברירת מחדל
+## Default Users
 
-| שם משתמש | סיסמה       | תפקיד          |
-|-----------|-------------|----------------|
-| admin     | admin123    | מנהל מערכת     |
-| manager   | manager123  | מנהל אירועים   |
+| Username | Password    | Role           |
+|----------|-------------|----------------|
+| admin    | admin123    | System Admin   |
+| manager  | manager123  | Event Manager  |
 
 ---
 
-## תכונות עיקריות
+## Key Features
 
-- **ניהול אירועים** — יצירה, עריכה, שינוי סטטוס (טיוטה → פעיל → הסתיים)
-- **משתתפים** — הוספה, RSVP (אישור/דחיית הגעה), ניהול התראות
-- **סקרים** — יצירת סקרים עם שאלות, הצבעה, תוצאות
-- **פיננסים** — מעקב תשלומים, ספקים, קבלות
-- **הזמנות** — שליחת הזמנות במייל למשתתפים
-- **הרשאות** — Admin / Manager / Participant עם הגנה על endpoints
+- **Event Management** — Create, edit, change status (Draft → Active → Completed)
+- **Participants** — Add participants, RSVP (confirm/decline attendance), manage notifications
+- **Polls** — Create polls with questions, voting, and results
+- **Financials** — Track payments, vendors, and receipts
+- **Invitations** — Send email invitations to participants
+- **Authorization** — Admin / Manager / Participant roles with protected endpoints
