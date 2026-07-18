@@ -3,9 +3,9 @@ import { Navbar } from './Navbar'
 
 export function Layout() {
   return (
-    <div dir="rtl">
+    <div dir="rtl" className="app-shell">
       <Navbar />
-      <main>
+      <main className="app-main">
         <Outlet />
       </main>
     </div>

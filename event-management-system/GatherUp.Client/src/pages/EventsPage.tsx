@@ -31,45 +31,84 @@ export function EventsPage() {
       .finally(() => setLoading(false))
   }, [canManage, userId, username])
 
-  if (loading) return <p>טוען אירועים...</p>
-  if (error) return <p>{error}</p>
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="spinner" />
+        <p>טוען אירועים...</p>
+      </div>
+    )
+  }
+
+  if (error) return <div className="alert alert--error">{error}</div>
 
   return (
-    <div>
-      <div>
-        <h1>{canManage ? 'כל האירועים' : 'האירועים שלי'}</h1>
-        {canManage && <Button onClick={() => navigate('/events/new')}>+ אירוע חדש</Button>}
+    <div className="page">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">{canManage ? 'כל האירועים' : 'האירועים שלי'}</h1>
+          <p className="page-subtitle">{events.length} אירועים</p>
+        </div>
+        {canManage && <Button onClick={() => navigate('/events/new')}>אירוע חדש</Button>}
       </div>
 
       {events.length === 0 ? (
         <Card>
-          <p>{canManage ? 'אין אירועים עדיין' : 'אין אירועים שאת/ה משתתף/ת בהם'}</p>
-          {canManage && <Button onClick={() => navigate('/events/new')}>צור אירוע ראשון</Button>}
+          <div className="empty-state">
+            <p>{canManage ? 'אין אירועים עדיין' : 'אין אירועים שאת/ה משתתף/ת בהם'}</p>
+            {canManage && (
+              <div style={{ marginTop: '1rem' }}>
+                <Button onClick={() => navigate('/events/new')}>צור אירוע ראשון</Button>
+              </div>
+            )}
+          </div>
         </Card>
       ) : (
-        <div>
+        <div className="events-grid">
           {events.map(event => {
             const myParticipant = event.participants?.find(
               p => p.appUserId === userId || p.email?.toLowerCase() === username?.toLowerCase()
             )
             return (
-              <Card key={event.id} onClick={() => navigate(`/events/${event.id}`)} style={{ cursor: 'pointer' }}>
-                <div>
-                  <h2>{event.title}</h2>
+              <Card key={event.id} interactive className="event-card" onClick={() => navigate(`/events/${event.id}`)}>
+                <div className="event-card-top">
+                  <h2 className="event-card-title">{event.title}</h2>
                   <StatusBadge status={event.status} />
                 </div>
-                <div>
-                  {event.eventDate && <p>📅 {new Date(event.eventDate).toLocaleDateString('he-IL')}</p>}
-                  {event.location && <p>📍 {event.location}</p>}
-                  <p>👥 {event.participants?.length ?? 0} משתתפים</p>
+                <div className="event-card-meta">
+                  {event.eventDate && (
+                    <div className="event-meta-item">
+                      <span className="event-meta-label">תאריך</span>
+                      {new Date(event.eventDate).toLocaleDateString('he-IL')}
+                    </div>
+                  )}
+                  {event.location && (
+                    <div className="event-meta-item">
+                      <span className="event-meta-label">מיקום</span>
+                      {event.location}
+                    </div>
+                  )}
+                  <div className="event-meta-item">
+                    <span className="event-meta-label">משתתפים</span>
+                    {event.participants?.length ?? 0}
+                  </div>
                   {event.pricePerParticipant != null && event.pricePerParticipant > 0 && (
-                    <p>💰 ₪{event.pricePerParticipant} לאדם</p>
+                    <div className="event-meta-item">
+                      <span className="event-meta-label">מחיר</span>
+                      ₪{event.pricePerParticipant} לאדם
+                    </div>
                   )}
                 </div>
                 {myParticipant && (
-                  <span>
-                    {myParticipant.isAttending === true ? '✓ אישרתי' : myParticipant.isAttending === false ? '✕ דחיתי' : '? טרם הגבתי'}
-                  </span>
+                  <div className={`event-rsvp ${
+                    myParticipant.isAttending === true ? 'event-rsvp--yes'
+                      : myParticipant.isAttending === false ? 'event-rsvp--no'
+                      : 'event-rsvp--pending'
+                  }`}>
+                    {myParticipant.isAttending === true ? 'אישרת הגעה'
+                      : myParticipant.isAttending === false ? 'דחית הגעה'
+                      : 'טרם הגבת'}
+                  </div>
                 )}
               </Card>
             )

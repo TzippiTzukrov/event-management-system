@@ -13,11 +13,11 @@ import { SettingsTab } from '../components/event/SettingsTab'
 
 type Tab = 'participants' | 'polls' | 'finance' | 'settings'
 
-const allTabs: { id: Tab; label: string; icon: string; managerOnly?: boolean }[] = [
-  { id: 'participants', label: 'משתתפים', icon: '👥' },
-  { id: 'polls',        label: 'סקרים',   icon: '📊' },
-  { id: 'finance',      label: 'פיננסים', icon: '💰' },
-  { id: 'settings',     label: 'הגדרות',  icon: '⚙️', managerOnly: true },
+const allTabs: { id: Tab; label: string; managerOnly?: boolean }[] = [
+  { id: 'participants', label: 'משתתפים' },
+  { id: 'polls',        label: 'סקרים' },
+  { id: 'finance',      label: 'פיננסים' },
+  { id: 'settings',     label: 'הגדרות', managerOnly: true },
 ]
 
 export function EventDetailPage() {
@@ -42,7 +42,7 @@ export function EventDetailPage() {
       .then(setEvent)
       .catch(() => navigate('/events'))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, navigate])
 
   async function changeStatus(status: EventStatus) {
     if (!event) return
@@ -61,44 +61,58 @@ export function EventDetailPage() {
     alert('הזמנות נשלחו!')
   }
 
-  if (loading) return (
-    <div className="flex flex-col justify-center items-center h-64 gap-4">
-      <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
-      <p className="text-gray-400 text-sm">טוען אירוע...</p>
-    </div>
-  )
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="spinner" />
+        <p>טוען אירוע...</p>
+      </div>
+    )
+  }
 
   if (!event) return null
 
   return (
-    <div dir="rtl">
-      {/* Back */}
-      <button onClick={() => navigate('/events')}
-        className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-violet-600 mb-5 transition-colors group">
-        <span className="group-hover:-translate-x-1 transition-transform">←</span>
-        חזרה לאירועים
+    <div dir="rtl" className="page">
+      <button type="button" className="back-link" onClick={() => navigate('/events')}>
+        ← חזרה לאירועים
       </button>
 
-      {/* Header Card */}
-      <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-6 mb-6 text-white shadow-xl shadow-violet-200/50">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="event-hero">
+        <div className="event-hero-top">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold">{event.title}</h1>
-              <span className="bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-semibold border border-white/30">
-                <StatusBadge status={event.status} />
-              </span>
+            <div className="event-hero-title">
+              <h1>{event.title}</h1>
+              <StatusBadge status={event.status} />
             </div>
-            <div className="flex flex-wrap gap-4 text-sm text-white/80">
-              {event.eventDate && <span>📅 {new Date(event.eventDate).toLocaleDateString('he-IL')}</span>}
-              {event.location && <span>📍 {event.location}</span>}
-              <span>👥 {event.participants?.length ?? 0} משתתפים</span>
-              {event.pricePerParticipant && <span>💰 ₪{event.pricePerParticipant} לאדם</span>}
+            <div className="event-hero-meta">
+              {event.eventDate && (
+                <div className="event-meta-item">
+                  <span className="event-meta-label">תאריך</span>
+                  {new Date(event.eventDate).toLocaleDateString('he-IL')}
+                </div>
+              )}
+              {event.location && (
+                <div className="event-meta-item">
+                  <span className="event-meta-label">מיקום</span>
+                  {event.location}
+                </div>
+              )}
+              <div className="event-meta-item">
+                <span className="event-meta-label">משתתפים</span>
+                {event.participants?.length ?? 0}
+              </div>
+              {event.pricePerParticipant != null && event.pricePerParticipant > 0 && (
+                <div className="event-meta-item">
+                  <span className="event-meta-label">מחיר</span>
+                  ₪{event.pricePerParticipant} לאדם
+                </div>
+              )}
             </div>
           </div>
 
           {canManage && (
-            <div className="flex flex-wrap gap-2">
+            <div className="event-hero-actions">
               {event.status === EventStatus.Draft && (
                 <Button variant="secondary" size="sm" onClick={() => changeStatus(EventStatus.PollOpen)} loading={statusLoading}>
                   פתח סקר
@@ -132,24 +146,19 @@ export function EventDetailPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-white rounded-2xl p-1.5 mb-6 w-fit shadow-sm border border-gray-100">
+      <div className="tabs">
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-              ${activeTab === tab.id
-                ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-200'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+            className={`tab${activeTab === tab.id ? ' tab--active' : ''}`}
           >
-            <span>{tab.icon}</span>
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Content */}
       {activeTab === 'participants' && <ParticipantsTab event={event} onReload={reload} />}
       {activeTab === 'polls'        && <PollsTab event={event} onReload={reload} />}
       {activeTab === 'finance'      && <FinanceTab event={event} onReload={reload} />}

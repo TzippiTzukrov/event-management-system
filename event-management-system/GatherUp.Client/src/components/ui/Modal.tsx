@@ -7,18 +7,15 @@ interface Props {
   size?: 'sm' | 'md' | 'lg'
 }
 
-export function Modal({ title, onClose, children }: Props) {
+export function Modal({ title, onClose, children, size = 'md' }: Props) {
   return (
-    <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', zIndex: 50 }}
-      onClick={e => e.target === e.currentTarget && onClose()}
-    >
-      <div style={{ background: 'white', width: '100%', maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee' }}>
-          <h2>{title}</h2>
-          <button onClick={onClose} aria-label="סגור">×</button>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={`modal ${size === 'lg' ? 'modal--lg' : ''}`} role="dialog" aria-modal="true">
+        <div className="modal-header">
+          <h2 className="modal-title">{title}</h2>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="סגור">×</button>
         </div>
-        <div style={{ padding: '1rem' }}>{children}</div>
+        <div className="modal-body">{children}</div>
       </div>
     </div>
   )

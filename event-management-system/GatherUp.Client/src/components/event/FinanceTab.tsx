@@ -22,7 +22,6 @@ export function FinanceTab({ event, onReload }: Props) {
   const vendors = event.vendors ?? []
   const participants = event.participants ?? []
 
-  // המשתתף המחובר
   const currentParticipant = participants.find(
     p => p.email?.toLowerCase() === username?.toLowerCase() ||
          p.name?.toLowerCase() === username?.toLowerCase()
@@ -64,159 +63,151 @@ export function FinanceTab({ event, onReload }: Props) {
     finally { setLoading(false) }
   }
 
-  // תצוגה למשתמש רגיל — רק פרטי התשלום שלו
   if (!canManage) {
     if (!currentParticipant) {
-      return (
-        <Card className="p-8 text-center text-gray-400">
-          אינך רשום/ה כמשתתף/ת באירוע זה
-        </Card>
-      )
+      return <Card><div className="empty-state">אינך רשום/ה כמשתתף/ת באירוע זה</div></Card>
     }
 
     return (
-      <div className="space-y-4">
-        <Card className="p-6">
-          <h3 className="font-semibold text-gray-700 mb-4">מצב התשלום שלי</h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-gray-500">סכום לתשלום</span>
-              <span className="font-semibold text-gray-800">
-                {event.pricePerParticipant ? `₪${event.pricePerParticipant}` : 'לא הוגדר'}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-gray-500">סטטוס תשלום</span>
-              {currentParticipant.hasPaid
-                ? <span className="text-green-600 font-medium">✓ שולם (₪{currentParticipant.amountPaid})</span>
-                : <span className="text-red-500 font-medium">טרם שולם</span>
-              }
-            </div>
-            {!currentParticipant.hasPaid && (
-              <div className="flex justify-between items-center py-2 border-b">
-                <span className="text-gray-500">אמצעי תשלום</span>
-                <span className="text-gray-700">{PaymentMethodLabels[event.paymentMethod]}</span>
-              </div>
-            )}
-            {!currentParticipant.hasPaid && event.paymentMethod === PaymentMethod.BankTransfer && event.bankDetails && (
-              <div className="py-2 border-b">
-                <p className="text-gray-500 mb-1">פרטי חשבון בנק</p>
-                <p className="text-gray-700 font-medium">{event.bankDetails}</p>
-              </div>
-            )}
-            {!currentParticipant.hasPaid && event.paymentMethod === PaymentMethod.Cash && event.cashContactName && (
-              <div className="py-2 border-b">
-                <p className="text-gray-500 mb-1">תשלום מזומן אצל</p>
-                <p className="text-gray-700 font-medium">{event.cashContactName}</p>
-              </div>
-            )}
+      <Card className="card-body">
+        <h3 className="card-section-title">מצב התשלום שלי</h3>
+        <div className="detail-row">
+          <span className="detail-label">סכום לתשלום</span>
+          <span className="detail-value">
+            {event.pricePerParticipant ? `₪${event.pricePerParticipant}` : 'לא הוגדר'}
+          </span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">סטטוס תשלום</span>
+          {currentParticipant.hasPaid
+            ? <span className="text-success">שולם (₪{currentParticipant.amountPaid})</span>
+            : <span className="text-danger">טרם שולם</span>
+          }
+        </div>
+        {!currentParticipant.hasPaid && (
+          <div className="detail-row">
+            <span className="detail-label">אמצעי תשלום</span>
+            <span className="detail-value">{PaymentMethodLabels[event.paymentMethod]}</span>
           </div>
-        </Card>
-      </div>
+        )}
+        {!currentParticipant.hasPaid && event.paymentMethod === PaymentMethod.BankTransfer && event.bankDetails && (
+          <div className="detail-row">
+            <span className="detail-label">פרטי חשבון בנק</span>
+            <span className="detail-value">{event.bankDetails}</span>
+          </div>
+        )}
+        {!currentParticipant.hasPaid && event.paymentMethod === PaymentMethod.Cash && event.cashContactName && (
+          <div className="detail-row">
+            <span className="detail-label">תשלום מזומן אצל</span>
+            <span className="detail-value">{event.cashContactName}</span>
+          </div>
+        )}
+      </Card>
     )
   }
 
-  // תצוגה מלאה למנהל
   return (
     <div className="space-y-6">
-      {/* סיכום תקציב */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="p-4 text-center">
-          <p className="text-xs text-gray-500 mb-1">נגבה</p>
-          <p className="text-2xl font-bold text-green-600">₪{totalCollected.toLocaleString()}</p>
+      <div className="stats-grid">
+        <Card className="stat-card">
+          <p className="stat-card-label">נגבה</p>
+          <p className="stat-card-value stat-card-value--success">₪{totalCollected.toLocaleString()}</p>
         </Card>
-        <Card className="p-4 text-center">
-          <p className="text-xs text-gray-500 mb-1">חובות לספקים</p>
-          <p className="text-2xl font-bold text-red-500">₪{totalVendors.toLocaleString()}</p>
+        <Card className="stat-card">
+          <p className="stat-card-label">חובות לספקים</p>
+          <p className="stat-card-value stat-card-value--danger">₪{totalVendors.toLocaleString()}</p>
         </Card>
-        <Card className="p-4 text-center">
-          <p className="text-xs text-gray-500 mb-1">יתרה</p>
-          <p className={`text-2xl font-bold ${totalCollected - totalVendors >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>
+        <Card className="stat-card">
+          <p className="stat-card-label">יתרה</p>
+          <p className={`stat-card-value ${totalCollected - totalVendors >= 0 ? 'stat-card-value--accent' : 'stat-card-value--danger'}`}>
             ₪{(totalCollected - totalVendors).toLocaleString()}
           </p>
         </Card>
       </div>
 
-      {/* תשלומי משתתפים */}
       <Card>
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h3 className="font-semibold text-gray-700">תשלומי משתתפים</h3>
+        <div className="card-header">
+          <h3 className="card-title">תשלומי משתתפים</h3>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-gray-50 text-gray-500 text-right">
-              <th className="px-4 py-3 font-medium">שם</th>
-              <th className="px-4 py-3 font-medium">סכום ששולם</th>
-              <th className="px-4 py-3 font-medium">סטטוס</th>
-              <th className="px-4 py-3 font-medium">פעולה</th>
-            </tr>
-          </thead>
-          <tbody>
-            {participants.map(p => (
-              <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50">
-                <td className="px-4 py-3">{p.name}</td>
-                <td className="px-4 py-3">₪{p.amountPaid ?? 0}</td>
-                <td className="px-4 py-3">
-                  {p.hasPaid
-                    ? <span className="text-green-600 font-medium">שולם</span>
-                    : <span className="text-gray-400">ממתין</span>
-                  }
-                </td>
-                <td className="px-4 py-3">
-                  {!p.hasPaid && (
-                    <button onClick={() => setShowPayment(p)} className="text-xs text-indigo-500 hover:underline">
-                      סמן כשולם
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
-
-      {/* ספקים */}
-      <Card>
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h3 className="font-semibold text-gray-700">ספקים</h3>
-          <Button onClick={() => setShowVendor(true)}>+ ספק</Button>
-        </div>
-        {vendors.length === 0 ? (
-          <p className="text-center text-gray-400 py-8">אין ספקים</p>
-        ) : (
-          <table className="w-full text-sm">
+        <div className="table-wrap">
+          <table className="data-table">
             <thead>
-              <tr className="border-b bg-gray-50 text-gray-500 text-right">
-                <th className="px-4 py-3 font-medium">שם ספק</th>
-                <th className="px-4 py-3 font-medium">סכום</th>
-                <th className="px-4 py-3 font-medium"></th>
+              <tr>
+                <th>שם</th>
+                <th>סכום ששולם</th>
+                <th>סטטוס</th>
+                <th>פעולה</th>
               </tr>
             </thead>
             <tbody>
-              {vendors.map(v => (
-                <tr key={v.id} className="border-b last:border-0">
-                  <td className="px-4 py-3">{v.name}</td>
-                  <td className="px-4 py-3">₪{v.amountOwed.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-left">
-                    <button onClick={() => deleteVendor(v.id)} className="text-xs text-red-400 hover:text-red-600">מחק</button>
+              {participants.map(p => (
+                <tr key={p.id}>
+                  <td className="cell-primary">{p.name}</td>
+                  <td>₪{p.amountPaid ?? 0}</td>
+                  <td>
+                    {p.hasPaid
+                      ? <span className="text-success">שולם</span>
+                      : <span className="text-muted">ממתין</span>
+                    }
+                  </td>
+                  <td>
+                    {!p.hasPaid && (
+                      <button type="button" className="table-action" onClick={() => setShowPayment(p)}>
+                        סמן כשולם
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="card-header">
+          <h3 className="card-title">ספקים</h3>
+          <Button size="sm" onClick={() => setShowVendor(true)}>ספק חדש</Button>
+        </div>
+        {vendors.length === 0 ? (
+          <div className="empty-state">אין ספקים</div>
+        ) : (
+          <div className="table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>שם ספק</th>
+                  <th>סכום</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {vendors.map(v => (
+                  <tr key={v.id}>
+                    <td className="cell-primary">{v.name}</td>
+                    <td>₪{v.amountOwed.toLocaleString()}</td>
+                    <td>
+                      <button type="button" className="table-action table-action--danger" onClick={() => deleteVendor(v.id)}>
+                        מחק
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
 
-      {/* מודל ספק */}
       {showVendor && (
         <Modal title="הוספת ספק" onClose={() => setShowVendor(false)}>
-          <div className="space-y-4">
+          <div className="form-stack">
             <Input label="שם ספק *" value={vendorForm.name}
               onChange={e => setVendorForm(f => ({ ...f, name: e.target.value }))} autoFocus />
             <Input label="סכום לתשלום (₪) *" type="number" min="0" value={vendorForm.amountOwed}
               onChange={e => setVendorForm(f => ({ ...f, amountOwed: e.target.value }))} />
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            <div className="flex gap-3 justify-end">
+            {error && <div className="alert alert--error">{error}</div>}
+            <div className="form-actions">
               <Button variant="secondary" onClick={() => setShowVendor(false)}>ביטול</Button>
               <Button onClick={addVendor} loading={loading}>הוסף</Button>
             </div>
@@ -224,23 +215,22 @@ export function FinanceTab({ event, onReload }: Props) {
         </Modal>
       )}
 
-      {/* מודל תשלום */}
       {showPayment && (
         <Modal title={`סימון תשלום — ${showPayment.name}`} onClose={() => setShowPayment(null)}>
-          <div className="space-y-4">
+          <div className="form-stack">
             <Input label="סכום ששולם (₪)" type="number" min="0" value={paymentForm.amount}
               onChange={e => setPaymentForm(f => ({ ...f, amount: e.target.value }))} autoFocus />
-            <div className="flex gap-4">
+            <div className="radio-group">
               {[PaymentMethod.BankTransfer, PaymentMethod.Cash].map(m => (
-                <label key={m} className="flex items-center gap-2 cursor-pointer">
+                <label key={m} className="radio-label">
                   <input type="radio" checked={paymentForm.method === m}
                     onChange={() => setPaymentForm(f => ({ ...f, method: m }))} />
-                  <span className="text-sm">{PaymentMethodLabels[m]}</span>
+                  {PaymentMethodLabels[m]}
                 </label>
               ))}
             </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            <div className="flex gap-3 justify-end">
+            {error && <div className="alert alert--error">{error}</div>}
+            <div className="form-actions">
               <Button variant="secondary" onClick={() => setShowPayment(null)}>ביטול</Button>
               <Button onClick={markPayment} loading={loading}>שמור תשלום</Button>
             </div>
