@@ -17,5 +17,6 @@ public class Participant : Person
     [Range(0, double.MaxValue, ErrorMessage = "הסכום ששולם לא יכול להיות שלילי.")]
     public decimal AmountPaid { get; set; } = 0;
 
-    public NotificationPreference NotificationPreferences { get; set; } = NotificationPreference.None;
+    public NotificationPreference NotificationPreferences { get; set; } =
+        NotificationPreference.EventChanges | NotificationPreference.NewPolls;
 }

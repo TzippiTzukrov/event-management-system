@@ -29,6 +29,7 @@ public class ReceiptXmlRepository : XmlRepository<ReceiptDetails>
         var doc = LoadDoc();
         doc.Root!.Add(new XElement("Receipt",
             new XAttribute("Id", receipt.Id),
+            new XElement("VendorId", receipt.VendorId),
             new XElement("Amount", receipt.Amount),
             new XElement("IssuedAt", receipt.IssuedAt),
             new XElement("FilePath", destPath)));
@@ -45,12 +46,24 @@ public class ReceiptXmlRepository : XmlRepository<ReceiptDetails>
 
         if (el is null) return null;
 
-        return new ReceiptDetails(
-            id,
-            decimal.Parse(el.Element("Amount")!.Value),
-            DateTime.Parse(el.Element("IssuedAt")!.Value),
-            el.Element("FilePath")!.Value);
+        return Parse(el);
     }
+
+    public IEnumerable<ReceiptDetails> GetByVendor(Guid vendorId)
+    {
+        var doc = LoadDoc();
+        return doc.Root!
+            .Elements("Receipt")
+            .Where(e => Guid.Parse(e.Element("VendorId")!.Value) == vendorId)
+            .Select(Parse);
+    }
+
+    private static ReceiptDetails Parse(XElement el) => new(
+        (Guid)el.Attribute("Id")!,
+        Guid.Parse(el.Element("VendorId")!.Value),
+        decimal.Parse(el.Element("Amount")!.Value),
+        DateTime.Parse(el.Element("IssuedAt")!.Value),
+        el.Element("FilePath")!.Value);
 
     public override void Update(ReceiptDetails entity) =>
         throw new BusinessRuleException("לא ניתן לערוך קבלה לאחר היצירה.");

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { eventsApi } from '../../api/events'
 import type { GatherEvent } from '../../types'
-import { PaymentMethod, ManagerNotificationPreference, NotificationPreference } from '../../types'
+import { PaymentMethod, ManagerNotificationPreference } from '../../types'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'

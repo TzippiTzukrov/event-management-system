@@ -14,6 +14,14 @@ public class FinancialController(
     FinanceService financeService,
     AuthorizationService authorizationService) : ControllerBase
 {
+    [HttpGet("budget")]
+    public IActionResult GetBudget(Guid eventId)
+    {
+        if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), eventId))
+            return Forbid();
+        return Ok(financeService.GetBudget(eventId));
+    }
+
     [HttpGet("vendors")]
     public IActionResult GetVendors(Guid eventId)
     {
@@ -38,6 +46,14 @@ public class FinancialController(
             return Forbid();
         financeService.DeleteVendor(eventId, vendorId);
         return NoContent();
+    }
+
+    [HttpGet("vendors/{vendorId:guid}/receipts")]
+    public IActionResult GetReceipts(Guid eventId, Guid vendorId)
+    {
+        if (!authorizationService.IsManagerOrAdmin(CurrentUserId(), CurrentRole(), eventId))
+            return Forbid();
+        return Ok(financeService.GetReceiptsByVendor(eventId, vendorId));
     }
 
     [HttpPost("vendors/{vendorId:guid}/receipt")]

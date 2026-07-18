@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { usersApi, type AppUserDto, type CreateUserResponse } from '../api/users'
-import { UserRole, UserRoleLabels } from '../types'
+import { UserRole } from '../types'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'

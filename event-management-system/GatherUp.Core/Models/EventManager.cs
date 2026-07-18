@@ -15,5 +15,8 @@ public class EventManager : Person
     /// <summary>
     /// על אילו פעולות המנהל מעוניין לקבל התראה במייל.
     /// </summary>
-    public ManagerNotificationPreference NotificationPreferences { get; set; } = ManagerNotificationPreference.None;
+    public ManagerNotificationPreference NotificationPreferences { get; set; } =
+        ManagerNotificationPreference.RsvpReceived |
+        ManagerNotificationPreference.PaymentReceived |
+        ManagerNotificationPreference.VoteSubmitted;
 }

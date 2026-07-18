@@ -173,7 +173,8 @@ public class NotificationService(
             ?? throw new NotFoundException($"אירוע {eventId} לא נמצא.");
 
         var recipients = ev.Participants
-            .Where(p => !string.IsNullOrWhiteSpace(p.Email))
+            .Where(p => p.NotificationPreferences.HasFlag(NotificationPreference.EventChanges)
+                     && !string.IsNullOrWhiteSpace(p.Email))
             .Select(p => p.Email)
             .ToList();
 

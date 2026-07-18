@@ -55,7 +55,7 @@ public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier n
         if (!ev.Vendors.Any(v => v.Id == vendorId))
             throw new NotFoundException($"ספק {vendorId} לא נמצא.");
 
-        receiptRepo.Add(receipt);
+        receiptRepo.Add(receipt with { VendorId = vendorId });
     }
 
     public IEnumerable<VendorAllocation> GetVendors(Guid eventId)
@@ -87,8 +87,17 @@ public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier n
         return ev.Budget;
     }
 
+    public IEnumerable<ReceiptDetails> GetReceiptsByVendor(Guid eventId, Guid vendorId)
+    {
+        var ev = eventRepo.GetById(eventId)
+            ?? throw new NotFoundException($"אירוע {eventId} לא נמצא.");
+        if (!ev.Vendors.Any(v => v.Id == vendorId))
+            throw new NotFoundException($"ספק {vendorId} לא נמצא.");
+        return receiptRepo.GetByVendor(vendorId);
+    }
+
     /// <summary>
-    /// שיטוח כל הקבלות מכל הספקים, ממוין לפי תאריך יורד — SelectMany.
+    /// שיטוח כל הקבלות מכל הספקים, ממוין לפי תאריך יורד.
     /// </summary>
     public IEnumerable<ReceiptDetails> GetAllReceiptsSorted(Guid eventId)
     {
@@ -96,7 +105,7 @@ public class FinanceService(IRepository<GatherEvent> eventRepo, IEventNotifier n
             ?? throw new NotFoundException($"אירוע {eventId} לא נמצא.");
 
         return ev.Vendors
-            .SelectMany(v => v.Receipts)
+            .SelectMany(v => receiptRepo.GetByVendor(v.Id))
             .OrderByDescending(r => r.IssuedAt);
     }
 }

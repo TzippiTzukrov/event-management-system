@@ -21,7 +21,6 @@ public static class InitializeData
         {
             Name = "רחל דוד",
             Email = "avitall3560@gmail.com",
-            NotificationPreferences = NotificationPreference.DirectMessages
         };
 
         var vendor = new VendorAllocation { Name = "קייטרינג אורות", AmountOwed = 2500 };

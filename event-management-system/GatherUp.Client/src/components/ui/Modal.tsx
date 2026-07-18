@@ -7,26 +7,18 @@ interface Props {
   size?: 'sm' | 'md' | 'lg'
 }
 
-const sizes = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' }
-
-export function Modal({ title, onClose, children, size = 'md' }: Props) {
+export function Modal({ title, onClose, children }: Props) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn"
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', zIndex: 50 }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div className={`bg-white rounded-3xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] overflow-y-auto animate-slideUp`}>
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-800">{title}</h2>
-          <button
-            onClick={onClose}
-            aria-label="סגור"
-            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors text-xl leading-none"
-          >
-            ×
-          </button>
+      <div style={{ background: 'white', width: '100%', maxWidth: '32rem', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee' }}>
+          <h2>{title}</h2>
+          <button onClick={onClose} aria-label="סגור">×</button>
         </div>
-        <div className="px-6 py-5">{children}</div>
+        <div style={{ padding: '1rem' }}>{children}</div>
       </div>
     </div>
   )

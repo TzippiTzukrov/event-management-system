@@ -26,7 +26,7 @@ void Run(GatherUp.Core.Interfaces.IRepository<GatherEvent> repo)
 
     var p1 = new Participant { Name = "יוסי כהן",  Email = "yosi@test.com",  NotificationPreferences = NotificationPreference.EventChanges };
     var p2 = new Participant { Name = "דינה לוי",  Email = "dina@test.com",  NotificationPreferences = NotificationPreference.NewPolls };
-    var p3 = new Participant { Name = "אבי מזרחי", Email = "avi@test.com",   NotificationPreferences = NotificationPreference.DirectMessages };
+    var p3 = new Participant { Name = "אבי מזרחי", Email = "avi@test.com" };
 
     Initialize.AddParticipantToEvent(repo, eventId, p1);
     Initialize.AddParticipantToEvent(repo, eventId, p2);
@@ -50,7 +50,7 @@ void TestReceipt(ReceiptXmlRepository receiptRepo)
     var dummyFile = Path.Combine(AppContext.BaseDirectory, "sample_receipt.txt");
     File.WriteAllText(dummyFile, "קבלה לדוגמה");
 
-    var receipt = new ReceiptDetails(Guid.NewGuid(), 350m, DateTime.Now, dummyFile);
+    var receipt = new ReceiptDetails(Guid.NewGuid(), Guid.Empty, 350m, DateTime.Now, dummyFile);
     receiptRepo.Add(receipt);
 
     Console.WriteLine($"\nקבלה נוספה: {receipt.Id} | {receipt.Amount}₪");

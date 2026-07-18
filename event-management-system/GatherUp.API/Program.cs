@@ -34,7 +34,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // --- JWT ---
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "GatherUp_SuperSecret_Key_2024!@#$";
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    jwtKey = "GatherUp_SuperSecret_Key_2024!@#$";
+    Console.WriteLine("[WARNING] Jwt:Key is not configured. Using insecure default key — do NOT use in production.");
+}
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
