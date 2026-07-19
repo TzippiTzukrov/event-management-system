@@ -43,12 +43,17 @@ A full-featured event management system with a user interface, API, participant 
 
 ```
 event-management-system/
-├── GatherUp.API/            # Web API layer — Controllers, Middleware
-├── GatherUp.BL/             # Business logic layer — Services
-├── GatherUp.Core/           # Models, Interfaces, Enums, Exceptions
-├── GatherUp.Infrastructure/ # Repositories, XML, Email
-├── GatherUp.Client/         # React Frontend
-└── GatherUp.Tests/          # Tests
+├── GatherUp.API/            # Web API — Controllers, Middleware, Program.cs
+│   └── Properties/          # launchSettings.json (port 5000)
+├── GatherUp.BL/             # Business logic — Services
+├── GatherUp.Core/           # Models, Interfaces, Enums, Exceptions, DTOs
+├── GatherUp.Infrastructure/ # Repositories (XML), Email
+│   └── Data/                # Runtime XML files (gitignored)
+├── GatherUp.Client/         # React frontend (Vite + TypeScript)
+├── GatherUp.Tests/          # Manual integration tests
+├── screenshots/             # UI screenshots
+├── GatherUp.slnx            # Solution file
+└── .gitignore
 ```
 
 ---
@@ -61,7 +66,7 @@ event-management-system/
 
 ### 1. Configure appsettings
 
-In the `GatherUp.API` folder, create an `appsettings.json` based on `appsettings.Example.json`:
+In `GatherUp.API/`, copy `appsettings.Example.json` to `appsettings.json` and fill in your values:
 
 ```json
 {
@@ -77,17 +82,18 @@ In the `GatherUp.API` folder, create an `appsettings.json` based on `appsettings
 }
 ```
 
-> If Email is not configured — the system will run without sending emails.
+> If `Email` is not configured — the system starts normally and skips email sending.  
+> If `Jwt:Key` is not configured — a default insecure key is used with a console warning. **Do not skip this in production.**
 
-### 2. Start the server
+### 2. Start the API
 
 ```bash
 cd event-management-system/GatherUp.API
 dotnet run
 ```
 
-Server runs at: `http://localhost:5000`  
-Swagger UI available at: `http://localhost:5000/swagger`
+- API: `http://localhost:5000`
+- Swagger: `http://localhost:5000/swagger`
 
 ### 3. Start the client
 
@@ -97,23 +103,23 @@ npm install
 npm run dev
 ```
 
-Client runs at: `http://localhost:5173`
+- Client: `http://localhost:5173`
 
 ---
 
 ## Default Users
 
-| Username | Password    | Role           |
-|----------|-------------|----------------|
-| admin    | admin123    | System Admin   |
-| manager  | manager123  | Event Manager  |
+| Username | Password   | Role          |
+|----------|------------|---------------|
+| admin    | admin123   | System Admin  |
+| manager  | manager123 | Event Manager |
 
 ---
 
 ## Key Features
 
 - **Event Management** — Create, edit, change status (Draft → Active → Completed)
-- **Participants** — Add participants, RSVP (confirm/decline attendance), manage notifications
+- **Participants** — Add participants, RSVP, manage notifications
 - **Polls** — Create polls with questions, voting, and results
 - **Financials** — Track payments, vendors, and receipts
 - **Invitations** — Send email invitations to participants
